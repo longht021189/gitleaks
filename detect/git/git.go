@@ -86,14 +86,40 @@ func getCommitDetail(dir, commit string) (string, error) {
 	return string(bytes), nil
 }
 
-func gitLogGitRequest(source string, flags *f.GitRequestFlags) (*stdResult, error) {
-	if flags == nil || flags.SourceBranch == "" || flags.TargetBranch == "" {
-		return nil, nil
+func gitLogGitRequest(source string, flags *f.GitRequestFlags, commitsFile string) (*stdResult, error) {
+	var (
+		commits []string
+		err     error
+		enabled = false
+	)
+	if flags != nil && flags.SourceBranch != "" && flags.TargetBranch != "" {
+		commits, err = getAllCommit(source, flags.SourceBranch, flags.TargetBranch)
+		if err != nil {
+			return nil, err
+		}
+		enabled = true
 	}
-
-	commits, err := getAllCommit(source, flags.SourceBranch, flags.TargetBranch)
-	if err != nil {
-		return nil, err
+	if commitsFile != "" {
+		file, err := os.Open(commitsFile)
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+		bytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			return nil, err
+		}
+		content := string(bytes)
+		lines := strings.Split(content, "\n")
+		for _, line := range lines {
+			words := strings.Split(line, " ")
+			if words[0] != "" {
+				commits = append(commits, words[0])
+			}
+		}
+	}
+	if !enabled {
+		return nil, nil
 	}
 
 	changesDetail := ""
@@ -134,6 +160,7 @@ func gitLog(source string, logOpts string) (*stdResult, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, err
@@ -153,7 +180,7 @@ func GitLog(source string, logOpts string) (<-chan *gitdiff.File, error) {
 		err error
 	)
 
-	std, err = gitLogGitRequest(source, f.GetGitRequestFlags())
+	std, err = gitLogGitRequest(source, f.GetGitRequestFlags(), f.GetCommitsFlags().File)
 	if err != nil {
 		return nil, err
 	}
