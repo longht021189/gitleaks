@@ -14,7 +14,7 @@ var commitsCmd = &cobra.Command{
 func init() {
 	detectCmd.AddCommand(commitsCmd)
 	flags := flags.GetCommitsFlags()
-	gitRequestCmd.Flags().StringVar(&flags.File, "commits-file", "", "Commits (--format=oneline) in File")
+	commitsCmd.Flags().StringVar(&flags.File, "commits-file", "", "Commits (--format=oneline) in File")
 }
 
 func runDetectCommits(cmd *cobra.Command, args []string) {
