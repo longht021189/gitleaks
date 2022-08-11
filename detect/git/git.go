@@ -132,6 +132,7 @@ func gitLogGitRequest(source string, flags *f.GitRequestFlags, commitsFile strin
 		if err != nil {
 			return nil, err
 		}
+		log.Warn().Msgf("-- Get Commit: %s", c)
 		if !isFirst {
 			changesDetail += "\n"
 		}
