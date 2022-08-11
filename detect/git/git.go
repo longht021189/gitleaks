@@ -117,10 +117,13 @@ func gitLogGitRequest(source string, flags *f.GitRequestFlags, commitsFile strin
 				commits = append(commits, words[0])
 			}
 		}
+		enabled = true
 	}
 	if !enabled {
 		return nil, nil
 	}
+
+	log.Warn().Msgf("Commits Count: %d", len(commits))
 
 	changesDetail := ""
 	isFirst := true
