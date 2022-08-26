@@ -76,7 +76,7 @@ func getCommitDetail(dir, commit string) (string, error) {
 	sourceClean := filepath.Clean(dir)
 	args := []string{"-C", sourceClean, "show", "-p", "-U0", commit}
 	cmd := exec.Command("git", args...)
-	log.Debug().Msgf("executing: %s", cmd.String())
+	log.Warn().Msgf("executing: %s", cmd.String())
 
 	bytes, err := getCmdOutput(cmd)
 	if err != nil {
